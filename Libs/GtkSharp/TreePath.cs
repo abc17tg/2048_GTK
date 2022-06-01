@@ -1,0 +1,60 @@
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of version 2 of the Lesser GNU General 
+// Public License as published by the Free Software Foundation.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this program; if not, write to the
+// Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+// Boston, MA 02111-1307, USA.
+
+namespace Gtk {
+
+	using System;
+	using System.Runtime.InteropServices;
+
+	public partial class TreePath {
+
+		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+		delegate IntPtr d_gtk_tree_path_get_indices_with_depth(IntPtr raw, out int depth);
+		static d_gtk_tree_path_get_indices_with_depth gtk_tree_path_get_indices_with_depth = FuncLoader.LoadFunction<d_gtk_tree_path_get_indices_with_depth>(FuncLoader.GetProcAddress(GLibrary.Load(Library.Gtk), "gtk_tree_path_get_indices_with_depth"));
+
+		public int [] Indices { 
+			get {
+				IntPtr arrPtr = gtk_tree_path_get_indices_with_depth(Handle, out int depth);
+				int[] arr = new int[depth];
+				if (arrPtr != IntPtr.Zero)
+					Marshal.Copy(arrPtr, arr, 0, depth);
+				return arr;
+			}
+		}
+
+		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+		delegate IntPtr d_gtk_tree_path_new_from_indicesv(int[] indices, UIntPtr length);
+		static d_gtk_tree_path_new_from_indicesv gtk_tree_path_new_from_indicesv = FuncLoader.LoadFunction<d_gtk_tree_path_new_from_indicesv>(FuncLoader.GetProcAddress(GLibrary.Load(Library.Gtk), "gtk_tree_path_new_from_indicesv"));
+
+		public TreePath (int[] indices)
+		{
+			Raw = gtk_tree_path_new_from_indicesv(indices, (UIntPtr)indices.Length);
+		}
+
+		public override bool Equals (object o)
+		{
+			if (!(o is TreePath))
+				return false;
+
+			return (Compare (o as TreePath) == 0);
+		}
+
+		public override int GetHashCode ()
+		{
+			return ToString ().GetHashCode ();
+		}
+	}
+}
+

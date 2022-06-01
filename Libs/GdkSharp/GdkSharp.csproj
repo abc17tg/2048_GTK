@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>GdkSharp is a C# wrapper for the Gdk library.</Description>
+    <PackageTags>gdk;gdksharp;gdk-sharp;wrapper</PackageTags>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <Compile Include="..\Shared\*.cs">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GLibSharp\GLibSharp.csproj">
+      <Name>GLibSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GioSharp\GioSharp.csproj">
+      <Name>GioSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CairoSharp\CairoSharp.csproj">
+      <Name>CairoSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PangoSharp\PangoSharp.csproj">
+      <Name>PangoSharp</Name>
+    </ProjectReference>
+  </ItemGroup>
+
+</Project>

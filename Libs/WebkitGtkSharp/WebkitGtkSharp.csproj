@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>GtkWebkitSharp is a C# wrapper for the Gtk-Webkit library.</Description>
+    <PackageTags>webkitgtk;webkitgtksharp;webkit-sharp;wrapper</PackageTags>
+    <RootNamespace>GtkWebkitSharp</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Shared\*.cs">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GtkSharp\GtkSharp.csproj" />
+  </ItemGroup>
+
+</Project>

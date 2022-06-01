@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>GioSharp is a C# wrapper for the Gio library.</Description>
+    <PackageTags>gio;giosharp;gio-sharp;wrapper</PackageTags>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <Compile Include="..\Shared\*.cs">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GLibSharp\GLibSharp.csproj">
+      <Name>GLibSharp</Name>
+    </ProjectReference>
+  </ItemGroup>
+
+</Project>

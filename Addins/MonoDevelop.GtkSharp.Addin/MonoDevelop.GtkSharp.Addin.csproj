@@ -1,0 +1,85 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net471</TargetFramework>
+    <OutputPath>..\..\..\BuildOutput\Addins\MonoDevelop\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MonoDevelop.Addins" Version="0.4.7" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Templates\File\Dialog.CS.xft.xml" />
+    <None Remove="Templates\File\Widget.CS.xft.xml" />
+    <None Remove="Templates\File\Window.CS.xft.xml" />
+    <None Remove="Templates\File\Data\Dialog.glade" />
+    <None Remove="Templates\File\Data\Widget.glade" />
+    <None Remove="Templates\File\Data\Window.glade" />
+    <None Remove="Templates\GtkSharp.Template.CSharp.nupkg" />
+    <None Remove="Templates\GtkSharp.Template.VBNet.nupkg" />
+    <None Remove="Templates\GtkSharp.Template.FSharp.nupkg" />
+    <None Remove="Templates\File\Data\Dialog.fs" />
+    <None Remove="Templates\File\Data\Widget.fs" />
+    <None Remove="Templates\File\Data\Window.fs" />
+    <None Remove="Templates\File\Dialog.FS.xft.xml" />
+    <None Remove="Templates\File\Widget.FS.xft.xml" />
+    <None Remove="Templates\File\Window.FS.xft.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Templates\File\Dialog.CS.xft.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\File\Widget.CS.xft.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\File\Window.CS.xft.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\File\Data\Dialog.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\File\Data\Dialog.glade">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\File\Data\Widget.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\File\Data\Widget.glade">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\File\Data\Window.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\File\Data\Window.glade">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\GtkSharp.Template.CSharp.nupkg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\GtkSharp.Template.FSharp.nupkg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\File\Data\Dialog.fs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\File\Data\Widget.fs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\File\Data\Window.fs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\File\Dialog.FS.xft.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\File\Widget.FS.xft.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\File\Window.FS.xft.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Templates\File\Data\Dialog.cs" />
+    <Compile Remove="Templates\File\Data\Widget.cs" />
+    <Compile Remove="Templates\File\Data\Window.cs" />
+  </ItemGroup>
+</Project>
