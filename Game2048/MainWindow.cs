@@ -27,14 +27,15 @@ class MainWindow : Gtk.Window
         Titlebar = headerBar;
         block = new Block();
         GameArea DrawArea = new GameArea();
-        DrawArea.SetSizeRequest(GameParameters.BlockSize * 4 + 5 * 10, GameParameters.BlockSize * 4 + 5 * 10);
+        DrawArea.SetSizeRequest(GameParameters.BlockSize * GameParameters.RowColumnCount + (GameParameters.RowColumnCount + 1) * GameParameters.BlockOffset,
+            GameParameters.BlockSize * GameParameters.RowColumnCount + (GameParameters.RowColumnCount + 1) * GameParameters.BlockOffset);
         DrawArea.ShowAll();
         Child = DrawArea;
 
-        int pow = 1;
+        int pow = 0;
         for (int i = 0; i < 4; i++)
             for (int j = 0; j < 4; j++)
-                DrawArea.DrawSquare((int)Math.Pow(2, pow++), GameParameters.BlockSize, 10, new Cairo.Point(i * GameParameters.BlockSize, j * GameParameters.BlockSize));
+                DrawArea.DrawBlock((int)Math.Pow(2, pow++), new Cairo.Point(i * GameParameters.BlockSize, j * GameParameters.BlockSize));
 
 
         /*
@@ -87,7 +88,7 @@ public class GameArea : DrawingArea
 
     public GameArea()
     {
-        int i = 0;
+
     }
 
     public void Clear()
@@ -96,60 +97,65 @@ public class GameArea : DrawingArea
         QueueDraw();
     }
 
-    public void DrawSquare(int value, int size, int offset, Cairo.Point position)
+    public void DrawBlock(int value, Cairo.Point position)
     {
         using (Context cx = new Context(canvas))
         {
-            //cx.MoveTo(position);
-            cx.LineWidth = 3;
-            cx.SetSourceRGBA(1, 1f - 0.7f * Math.Clamp((Math.Log2(value) + 4) / 16f, 0f, 1f), 
-                0, Math.Clamp((Math.Log2(value) + 4) / 16f, 0f, 1f));
-
-            int radius = 20;
-            int a = 0 + offset * (position.X / size + 1) + position.X;
-            int b = size + offset * (position.X / size + 1) + position.X;
-            int c = 0 + offset * (position.Y / size + 1) + position.Y;
-            int d = size + offset * (position.Y / size + 1) + position.Y;
-
-            cx.Arc(a + radius, c + radius, radius, 2 * (Math.PI / 2), 3 * (Math.PI / 2));
-            cx.Arc(b - radius, c + radius, radius, 3 * (Math.PI / 2), 4 * (Math.PI / 2));
-            cx.Arc(b - radius, d - radius, radius, 0 * (Math.PI / 2), 1 * (Math.PI / 2));
-            cx.Arc(a + radius, d - radius, radius, 1 * (Math.PI / 2), 2 * (Math.PI / 2));
-            cx.ClosePath();
-            cx.Fill();
-
-            cx.SetSourceRGB(0.2, 0.2, 0.2);
-            cx.LineWidth = 5;
-            DrawText(cx, size, value.ToString(), offset, position);
+            DrawSquare(cx, value, position);
+            if (value != 1)
+                DrawText(cx, value, position);
         }
         QueueDraw();
     }
 
-    private void DrawText(Context cr, int size, string text, int offset, Cairo.Point position)
+    public void DrawSquare(Context cx, int value, Cairo.Point position)
     {
+        cx.LineWidth = 3;
+        if (value == 1)
+            cx.SetSourceRGB(0.85, 0.85, 0.85);
+        else
+            cx.SetSourceRGBA(1, 1f - 0.7f * Math.Clamp((Math.Log2(value) + 4) / 16f, 0f, 1f),
+                0, Math.Clamp((Math.Log2(value) + 4) / 16f, 0f, 1f));
+
+        int radius = 20;
+        int a = 0 + GameParameters.BlockOffset * (position.X / GameParameters.BlockSize + 1) + position.X;
+        int b = GameParameters.BlockSize + GameParameters.BlockOffset * (position.X / GameParameters.BlockSize + 1) + position.X;
+        int c = 0 + GameParameters.BlockOffset * (position.Y / GameParameters.BlockSize + 1) + position.Y;
+        int d = GameParameters.BlockSize + GameParameters.BlockOffset * (position.Y / GameParameters.BlockSize + 1) + position.Y;
+
+        cx.Arc(a + radius, c + radius, radius, 2 * (Math.PI / 2), 3 * (Math.PI / 2));
+        cx.Arc(b - radius, c + radius, radius, 3 * (Math.PI / 2), 4 * (Math.PI / 2));
+        cx.Arc(b - radius, d - radius, radius, 0 * (Math.PI / 2), 1 * (Math.PI / 2));
+        cx.Arc(a + radius, d - radius, radius, 1 * (Math.PI / 2), 2 * (Math.PI / 2));
+        cx.ClosePath();
+        cx.Fill();
+    }
+
+    private void DrawText(Context cx, int value, Cairo.Point position)
+    {
+        if (value < 32)
+            cx.SetSourceRGB(0.2, 0.2, 0.2);
+        else
+            cx.SetSourceRGB(0.95, 0.95, 0.95);
+
         Pango.FontDescription font = new Pango.FontDescription();
         font.Family = "Consolas";
         font.Weight = Pango.Weight.Ultraheavy;
         font.Stretch = Pango.Stretch.UltraExpanded;
-        font.Size = Convert.ToInt32(30 * Pango.Scale.PangoScale);
-        Pango.Layout layout = CreatePangoLayout(text);
+        font.Size = Convert.ToInt32(GameParameters.BlockFontSize * Pango.Scale.PangoScale);
+        Pango.Layout layout = CreatePangoLayout(value.ToString());
 
         layout.FontDescription = font;
-
-        int text_width;
-        int text_height;
-
-        layout.GetPixelSize(out text_width, out text_height);
-        cr.MoveTo((size - text_width) / 2d + position.X + offset * (position.X / size + 1),
-            (size - text_height) / 2d + position.Y + offset * (position.Y / size + 1));
-
-        Pango.CairoHelper.ShowLayout(cr, layout);
+        layout.GetPixelSize(out int text_width, out int text_height);
+        cx.MoveTo((GameParameters.BlockSize - text_width) / 2d + position.X + GameParameters.BlockOffset * (position.X / GameParameters.BlockSize + 1),
+            (GameParameters.BlockSize - text_height) / 2d + position.Y + GameParameters.BlockOffset * (position.Y / GameParameters.BlockSize + 1));
+        Pango.CairoHelper.ShowLayout(cx, layout);
     }
 
-    protected override bool OnDrawn(Context c)
+    protected override bool OnDrawn(Context cx)
     {
-        c.SetSourceSurface(canvas, 0, 0);
-        c.Paint();
+        cx.SetSourceSurface(canvas, 0, 0);
+        cx.Paint();
         return true;
     }
 }
