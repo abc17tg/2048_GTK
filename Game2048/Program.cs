@@ -1,12 +1,13 @@
 using System;
 using Gtk;
+using Gdk;
 
 namespace Game2048;
 
 class Program
 {
     public static Application App;
-    public static Window Win;
+    public static Gtk.Window Win;
 
     [STAThread]
     public static void Main()
@@ -22,7 +23,6 @@ class Program
         var menu = new GLib.Menu();
         menu.AppendItem(new GLib.MenuItem("Help", "app.help"));
         menu.AppendItem(new GLib.MenuItem("About", "app.about"));
-        menu.AppendItem(new GLib.MenuItem("Quit", "app.quit"));
         App.AppMenu = menu;
 
         var helpAction = new GLib.SimpleAction("help", null);
@@ -32,10 +32,6 @@ class Program
         var aboutAction = new GLib.SimpleAction("about", null);
         aboutAction.Activated += AboutActivated;
         App.AddAction(aboutAction);
-
-        var quitAction = new GLib.SimpleAction("quit", null);
-        quitAction.Activated += QuitActivated;
-        App.AddAction(quitAction);
 
         Win.ShowAll();
         Application.Run();
@@ -87,10 +83,5 @@ class Program
 
         dialog.Run();
         dialog.Hide();
-    }
-
-    private static void QuitActivated(object sender, EventArgs e)
-    {
-        Application.Quit();
     }
 }

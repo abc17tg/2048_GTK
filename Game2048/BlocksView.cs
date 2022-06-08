@@ -5,18 +5,21 @@ namespace Game2048;
 public class BlocksView : BlocksManager
 {
     public Grid GameGrid;
+    public Fixed Canvas;
 
     public BlocksView()
     {
-        ConstructGrid();
+        //ConstructGrid();
+
+        Canvas.SetSizeRequest(800, 800);
     }
 
     public void UpdateView()
     {
-        GameGrid.ShowAll();
+        //GameGrid.ShowAll();
     }
 
-    private void ConstructGrid()
+    /*private void ConstructGrid()
     {
         GameGrid = new Grid();
         GameGrid.Margin = 8;
@@ -45,5 +48,5 @@ public class BlocksView : BlocksManager
         GameGrid.Remove(toDestroy2); toDestroy2.Dispose(); toDestroy2 = null;
         GameGrid.Attach(LoadBlock(BlockType._2), pl1, pt1, 1, 1);
         GameGrid.Attach(LoadBlock(BlockType._2), pl2, pt2, 1, 1);
-    }
+    }*/
 }
