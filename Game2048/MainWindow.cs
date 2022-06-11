@@ -1,9 +1,5 @@
 using Gtk;
-using Gdk;
-using Cairo;
-using System.Numerics;
 using System;
-using System.Collections.Generic;
 
 namespace Game2048;
 
@@ -15,9 +11,7 @@ class MainWindow : Gtk.Window
     private Button randomButton;
     private Button quitButton;
 
-    //public BlocksController blocksController;
-    private BlocksView blocksView;
-    private BlocksManager blocksManager;
+    public BlocksController blocksController;
     public Block block;
 
     public MainWindow() : base(Gtk.WindowType.Toplevel)
@@ -27,16 +21,14 @@ class MainWindow : Gtk.Window
         InitHeaderBar();
 
         Titlebar = headerBar;
-        //block = new Block();
-        blocksView = new BlocksView();
-        blocksView.SetSizeRequest((int)Math.Round(GameParameters.WindowSize.X), (int)Math.Round(GameParameters.WindowSize.Y));
-        blocksView.ShowAll();
-        Child = blocksView;
-
-        blocksManager = new BlocksManager();
+        blocksController = new BlocksController();
+        blocksController.View = new BlocksView();
+        blocksController.View.SetSizeRequest((int)Math.Round(GameParameters.WindowSize.X), (int)Math.Round(GameParameters.WindowSize.Y));
+        blocksController.View.ShowAll();
+        Child = blocksController.View;
         DrawGrid();
 
-        //KeyPressEvent += blocksController.Move;
+        KeyPressEvent += blocksController.Move;
     }
 
     private void DrawGrid()
@@ -44,7 +36,7 @@ class MainWindow : Gtk.Window
         for (int i = 0; i < GameParameters.BlockCount; i++)
         {
             var coordinates = i.IndexToCoordinatesOfMatrix(GameParameters.RowColumnCount);
-            blocksView.DrawBlock(blocksManager.BlocksList[i].Value, new Cairo.Point(coordinates.X, coordinates.Y));
+            blocksController.View.DrawBlock(blocksController.Blocks.BlocksList[i].Value, new Cairo.Point(coordinates.X, coordinates.Y));
         }
     }
 
@@ -70,7 +62,7 @@ class MainWindow : Gtk.Window
 
         randomButton = new Button();
         randomButton.Label = "Random";
-        //randomButton.Clicked += (sender, e) => blocksController.Move(Utils.RandomEnumValue<BlocksManager.Direction>());
+        randomButton.Clicked += (sender, e) => blocksController.Move(Utils.RandomEnumValue<BlocksManager.Direction>());
 
         quitButton = new Button();
         quitButton.Label = "Quit";

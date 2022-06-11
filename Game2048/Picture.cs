@@ -10,12 +10,5 @@ public class Picture
 
     public Gtk.Image GetImage(int width, int height) =>
         new Gtk.Image(image.Pixbuf.ScaleSimple(width, height, Gdk.InterpType.Nearest));
-
-    public static bool Compare(Gtk.Image im1, Gtk.Image im2)
-    {
-        if (Utils.CompareByteArrays(im1.Pixbuf.PixelBytes.Data, im2.Pixbuf.PixelBytes.Data))
-            return true;
-        return false;
-    }
 }
 

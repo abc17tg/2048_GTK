@@ -1,4 +1,4 @@
-﻿/*using Gtk;
+﻿using Gtk;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,28 +53,24 @@ public class BlocksController : BlocksManager
                 break;
         }
         if (merged)
-            Spawn();
-        else if (!View.GameGrid.Children.Any(p => Utils.CompareByteArrays(((Image)p).Pixbuf.PixelBytes.Data, Blocks.blocksPixelData.GetValueOrDefault(BlockType._1))))
-            new GameOver().GameOverWindow();
-
-        View.UpdateView();
+            if(!TrySpawn())
+                 new GameOver().GameOverWindow();
     }
 
-    private void Spawn()
+    private bool TrySpawn()
     {
-        Image child;
-        int l, t;
+        if(!Blocks.BlocksList.Any(p=>p.Value==1))
+            return false;
+        
         Random rnd = new Random();
-
-        do
-        {
-            l = rnd.Next(4); t = rnd.Next(4);
-            child = (Image)View.GameGrid.GetChildAt(l, t);
-        } while (!Utils.CompareByteArrays(child.Pixbuf.PixelBytes.Data, Blocks.blocksPixelData.GetValueOrDefault(BlockType._1)));
-
-        View.GameGrid.Remove(child); child.Dispose(); child = null;
-        View.GameGrid.Attach(LoadBlock(rnd.Next(101) < 30 ? BlockType._4 : BlockType._2), l, t, 1, 1);
+        List<Block> emptyBlocks = Blocks.BlocksList.Where(p => p.Value == 1).ToList();
+        int randomEmptyIndex = Blocks.BlocksList.IndexOf(emptyBlocks.ElementAt(rnd.Next(emptyBlocks.Count)));
+        var coordinates = randomEmptyIndex.IndexToCoordinatesOfMatrix(GameParameters.RowColumnCount);
+        Blocks.BlocksList[randomEmptyIndex].Value = rnd.Next(101) < 30 ? 4 : 2;
+        View.DrawBlock(Blocks.BlocksList[randomEmptyIndex].Value, new Cairo.Point(coordinates.X, coordinates.Y));
+        return true;
     }
+
 
     private (int X1, int Y1, int X2, int Y2) MergeLoopParameters(Direction direction)
     {
@@ -116,7 +112,7 @@ public class BlocksController : BlocksManager
             {
                 var ii = direction == Direction.Left ? i + 1 : direction == Direction.Right ? i - 1 : i;
                 var jj = direction == Direction.Up ? j + 1 : direction == Direction.Down ? j - 1 : j;
-                if (TryMerge(ii, jj, i, j))
+                if (TryMerge(new Cairo.Point(ii, jj), new Cairo.Point(i, j)))
                     merged.Add(true);
                 else
                     merged.Add(false);
@@ -139,7 +135,7 @@ public class BlocksController : BlocksManager
                 {
                     var ii = direction == Direction.Left ? i + 1 : direction == Direction.Right ? i - 1 : i;
                     var jj = direction == Direction.Up ? j + 1 : direction == Direction.Down ? j - 1 : j;
-                    if (!TryMergeEmpty(ii, jj, i, j))
+                    if (!TryMergeEmpty(new Cairo.Point(ii, jj), new Cairo.Point(i, j)))
                         stillEmpty[index++] = false;
                 }
             if (loop++ == 0 && stillEmpty.Contains(true))
@@ -150,41 +146,34 @@ public class BlocksController : BlocksManager
         return merged;
     }
 
-    private bool TryMerge(int sourceLeftPosition, int sourceTopPosition, int targetLeftPosition, int targetTopPosition)
+    private bool TryMerge(Cairo.Point source, Cairo.Point target)
     {
-        var child1 = (Image)View.GameGrid.GetChildAt(sourceLeftPosition, sourceTopPosition);
-        var child2 = (Image)View.GameGrid.GetChildAt(targetLeftPosition, targetTopPosition);
-        if (Utils.CompareByteArrays(child1.Pixbuf.PixelBytes.Data, Blocks.blocksPixelData.GetValueOrDefault(BlockType._1)) ||
-            Utils.CompareByteArrays(child2.Pixbuf.PixelBytes.Data, Blocks.blocksPixelData.GetValueOrDefault(BlockType._1)) ||
-            !IsMergable(child1, child2))
+        int indexTarget = target.CoordinatesOfMatrixToIndex(GameParameters.RowColumnCount);
+        int indexSource = source.CoordinatesOfMatrixToIndex(GameParameters.RowColumnCount);
+        if (BlocksList[indexSource].Value != BlocksList[indexTarget].Value)
             return false;
 
-        BlockType blockType = GetBlockType(child1.Pixbuf);
-        View.GameGrid.Remove(child1); child1.Dispose(); child1 = null;
-        View.GameGrid.Remove(child2); child2.Dispose(); child2 = null;
-        View.GameGrid.Attach(LoadBlock(BlockType._1), sourceLeftPosition, sourceTopPosition, 1, 1);
-        View.GameGrid.Attach(LoadBlock(GetNextBlockType(blockType)), targetLeftPosition, targetTopPosition, 1, 1);
+        Blocks.BlocksList.Swap(indexSource, indexTarget);
+        BlocksList[indexTarget].Value = BlocksList[indexTarget].GetNextValue();
+        BlocksList[indexSource].Value = 1;
+        View.DrawBlock(BlocksList[indexTarget].Value, target);
+        View.DrawBlock(BlocksList[indexSource].Value, source);
         return true;
     }
 
-    private bool TryMergeEmpty(int sourceLeftPosition, int sourceTopPosition, int emptyLeftPosition, int emptyTopPosition)
+    private bool TryMergeEmpty(Cairo.Point source, Cairo.Point empty)
     {
-        var child2 = (Image)View.GameGrid.GetChildAt(emptyLeftPosition, emptyTopPosition);
-        if (!Utils.CompareByteArrays(child2.Pixbuf.PixelBytes.Data, Blocks.blocksPixelData.GetValueOrDefault(BlockType._1)))
+        int indexSource= source.CoordinatesOfMatrixToIndex(GameParameters.RowColumnCount);
+        int indexEmpty = empty.CoordinatesOfMatrixToIndex(GameParameters.RowColumnCount);
+
+        if (BlocksList[indexEmpty].Value != 1 || BlocksList[indexSource].Value == 1)
             return false;
 
-        var child1 = (Image)View.GameGrid.GetChildAt(sourceLeftPosition, sourceTopPosition);
-        if (Utils.CompareByteArrays(child1.Pixbuf.PixelBytes.Data, Blocks.blocksPixelData.GetValueOrDefault(BlockType._1)))
-            return false;
-
-        BlockType blockType = GetBlockType(child1.Pixbuf);
-        View.GameGrid.Remove(child1); child1.Dispose(); child1 = null;
-        View.GameGrid.Remove(child2); child2.Dispose(); child2 = null;
-        View.GameGrid.Attach(LoadBlock(BlockType._1), sourceLeftPosition, sourceTopPosition, 1, 1);
-        View.GameGrid.Attach(LoadBlock(blockType), emptyLeftPosition, emptyTopPosition, 1, 1);
+        Blocks.BlocksList.Swap(indexEmpty, indexSource);
+        View.DrawBlock(BlocksList[indexSource].Value, source);
+        View.DrawBlock(BlocksList[indexEmpty].Value, empty);
         return true;
     }
 
 
 }
-*/

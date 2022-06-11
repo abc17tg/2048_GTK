@@ -41,8 +41,8 @@ class Program
     {
         App.RemoveWindow(Win);
         Win.Close();
-        Win.Destroy();
         Win.Dispose();
+        Win.Destroy();        
         Win = null;
 
         Win = new MainWindow();
