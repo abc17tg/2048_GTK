@@ -38,8 +38,7 @@ public class BlocksController
 
     public void Move(Direction direction)
     {
-        bool merged = false;
-        TryMove(direction, out merged);
+        TryMove(direction, out bool merged);
         if (merged)
             if (!TrySpawn())
                 if (GameOverObject.IsGameOver(Blocks.BlocksList))

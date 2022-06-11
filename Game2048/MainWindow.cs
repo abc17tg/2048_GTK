@@ -63,7 +63,11 @@ class MainWindow : Gtk.Window
 
         randomButton = new Button();
         randomButton.Label = "Random";
-        randomButton.Clicked += (sender, e) => blocksController.Move(Utils.RandomEnumValue<BlocksController.Direction>());
+        randomButton.Clicked += (sender, e) =>
+        {
+            blocksController.Move(Utils.RandomEnumValue<BlocksController.Direction>());
+            DrawGrid();
+        };
 
         quitButton = new Button();
         quitButton.Label = "Quit";

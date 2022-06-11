@@ -20,10 +20,12 @@ public class GameOver
         {
             Program.App.RemoveWindow(go);
             go.Close();
+            go.Hide();
             go.Dispose();
             go.Destroy();
             Program.Restart();
         };
+
         go.Add(gameOverBtn);
         go.ShowAll();
     }
