@@ -22,17 +22,18 @@ class MainWindow : Gtk.Window
 
         Titlebar = headerBar;
         blocksController = new BlocksController();
-        blocksController.View = new BlocksView();
         blocksController.View.SetSizeRequest((int)Math.Round(GameParameters.WindowSize.X), (int)Math.Round(GameParameters.WindowSize.Y));
         blocksController.View.ShowAll();
         Child = blocksController.View;
         DrawGrid();
 
         KeyPressEvent += blocksController.Move;
+        KeyReleaseEvent += (sender, e) => DrawGrid();
     }
 
     private void DrawGrid()
     {
+        blocksController.View.Clear();
         for (int i = 0; i < GameParameters.BlockCount; i++)
         {
             var coordinates = i.IndexToCoordinatesOfMatrix(GameParameters.RowColumnCount);
@@ -62,7 +63,7 @@ class MainWindow : Gtk.Window
 
         randomButton = new Button();
         randomButton.Label = "Random";
-        randomButton.Clicked += (sender, e) => blocksController.Move(Utils.RandomEnumValue<BlocksManager.Direction>());
+        randomButton.Clicked += (sender, e) => blocksController.Move(Utils.RandomEnumValue<BlocksController.Direction>());
 
         quitButton = new Button();
         quitButton.Label = "Quit";

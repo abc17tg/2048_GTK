@@ -13,5 +13,4 @@ public static class GameParameters
 
     public static Vector2 WindowSize =>
         new Vector2(BlockSize * RowColumnCount + (RowColumnCount + 1) * BlockOffset);
-
 }

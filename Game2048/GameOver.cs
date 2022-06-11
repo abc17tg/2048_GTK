@@ -1,8 +1,10 @@
 ﻿using Gtk;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Game2048;
-class GameOver
+public class GameOver
 {
     public void GameOverWindow()
     {
@@ -18,10 +20,23 @@ class GameOver
         {
             Program.App.RemoveWindow(go);
             go.Close();
-            go.Destroy(); go.Dispose();
+            go.Dispose();
+            go.Destroy();
             Program.Restart();
         };
         go.Add(gameOverBtn);
         go.ShowAll();
+    }
+
+    public bool IsGameOver(List<Block> blocks)
+    {
+        for (int i = 0; i < GameParameters.RowColumnCount; i++)
+        {
+            if (blocks.Row(i, GameParameters.RowColumnCount).Select(p => p.Value).HasDuplicates(1))
+                return false;
+            if (blocks.Column(i, GameParameters.RowColumnCount).Select(p => p.Value).HasDuplicates(1))
+                return false;
+        }
+        return true;
     }
 }

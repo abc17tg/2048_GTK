@@ -1,5 +1,4 @@
 ﻿using Gtk;
-using Gdk;
 using Cairo;
 using System;
 
@@ -31,6 +30,7 @@ public class BlocksView : DrawingArea
         int y = offset * (indexPosition.Y + 1) + indexPosition.Y * size;
         return new Cairo.Point(x, y);
     }
+
     public Cairo.Point RealPositionToIndexPosition(Cairo.Point realPosition)
     {
         int offset = GameParameters.BlockOffset;
