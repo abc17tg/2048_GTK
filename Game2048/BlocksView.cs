@@ -16,7 +16,9 @@ public class BlocksView : DrawingArea
 
     public void DrawBlock(int value, Cairo.Point position)
     {
-        DrawSquare(GameContext, value, position);
+        DrawSquare(GameContext, value, position, DrawType.Shadow);
+        DrawSquare(GameContext, value, position, DrawType.Background);
+        DrawSquare(GameContext, value, position, DrawType.Main);
         if (value != 1)
             DrawText(GameContext, value, position);
         QueueDraw();
@@ -40,20 +42,24 @@ public class BlocksView : DrawingArea
         return new Cairo.Point(x, y);
     }
 
-    private void DrawSquare(Context cx, int value, Cairo.Point position)
+    private void DrawSquare(Context cx, int value, Cairo.Point position, DrawType type)
     {
         cx.LineWidth = 3;
-        if (value == 1)
+        if (value == 1 && type == DrawType.Main)
             cx.SetSourceRGB(0.85, 0.85, 0.85);
-        else
+        else if (type == DrawType.Main)
             cx.SetSourceRGBA(1, 1f - 0.7f * Math.Clamp((Math.Log2(value) + 4) / 16f, 0f, 1f),
-                0, Math.Clamp((Math.Log2(value) + 4) / 16f, 0f, 1f));
+                0, Math.Clamp((Math.Log2(value) + 5) / 16f, 0f, 1f));
+        else if (type == DrawType.Shadow)
+            cx.SetSourceRGB(0.65, 0.65, 0.65);
+        else
+            cx.SetSourceRGB(1, 1, 1);
 
         Cairo.Point positionReal = IndexPositionToRealPosition(position);
         int a = positionReal.X;
         int b = GameParameters.BlockSize + a;
         int c = positionReal.Y;
-        int d = GameParameters.BlockSize + c;
+        int d = (int)Math.Round((type == DrawType.Shadow ? GameParameters.BlockSize : GameParameters.BlockSize * 0.94) + c);
         int radius = GameParameters.BlockCornerRadius;
         double PiHalf = Math.PI / 2;
 
@@ -84,7 +90,7 @@ public class BlocksView : DrawingArea
 
         int blockSize = GameParameters.BlockSize;
         Cairo.Point positionReal = IndexPositionToRealPosition(position);
-        cx.MoveTo((blockSize - textWidth) / 2 + positionReal.X, (blockSize - textHeight) / 2 + positionReal.Y);
+        cx.MoveTo((blockSize - textWidth) / 2 + positionReal.X, (blockSize * 0.96 - textHeight) / 2 + positionReal.Y);
         Pango.CairoHelper.ShowLayout(cx, layout);
     }
 
@@ -93,5 +99,12 @@ public class BlocksView : DrawingArea
         cx.SetSourceSurface(GameCanvas, 0, 0);
         cx.Paint();
         return true;
+    }
+
+    public enum DrawType
+    {
+        Background,
+        Shadow,
+        Main
     }
 }

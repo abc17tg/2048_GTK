@@ -9,6 +9,6 @@ public class Picture
     public Gtk.Image GetImage() => image;
 
     public Gtk.Image GetImage(int width, int height) =>
-        new Gtk.Image(image.Pixbuf.ScaleSimple(width, height, Gdk.InterpType.Nearest));
+        new Gtk.Image(image.Pixbuf.ScaleSimple(width, height, Gdk.InterpType.Bilinear));
 }
 
