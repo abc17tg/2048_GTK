@@ -1,13 +1,47 @@
 ﻿using Gtk;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Game2048;
+
 public class BlocksManager
+{
+    public List<List<Block>> BlocksMatrix;
+    public List<Block> BlocksList => BlocksMatrix.SelectMany(p => p).ToList();
+
+    public BlocksManager()
+    {
+        BlocksMatrix = new List<List<Block>>();
+        for (int i = 0; i < GameParameters.RowColumnCount; i++)
+        {
+            BlocksMatrix.Add(new List<Block>());
+            for (int j = 0; j < GameParameters.RowColumnCount; j++)
+                BlocksMatrix.Last().Add(new Block());
+        }
+        //alternative
+        /*for (int i = 0; i < GameParameters.BlockCount; i++)
+            BlocksList.Add(new Block());*/
+
+        BlocksList.ForEach(p=>p.Value = 1);
+        Random rnd= new Random();
+        List<int> startIndexes = Enumerable.Range(0, GameParameters.BlockCount).OrderBy(x => rnd.Next()).Take(2).ToList();
+        foreach (int index in startIndexes)
+            BlocksList[index].Value = 2;
+
+        /*for (int i = 0; i < GameParameters.BlockCount; i++)
+        {
+            var coordinates = i.IndexToCoordinatesOfMatrix(GameParameters.RowColumnCount);
+            BlocksList[i].DrawBlock(BlocksList[i].Value, new Cairo.Point(coordinates.X,coordinates.Y));
+        }*/
+
+    }
+}
+public class BlocksManagerOld
 {
     public Dictionary<BlockType, byte[]> blocksPixelData;
 
-    public BlocksManager()
+    public BlocksManagerOld()
     {
         blocksPixelData = new Dictionary<BlockType, byte[]>();
         foreach (var b in (BlockType[])Enum.GetValues(typeof(BlockType)))

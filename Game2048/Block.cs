@@ -9,54 +9,15 @@ namespace Game2048;
 public class Block
 {
     public int Value;
-    public ImageSurface ImSurface;
-    public Antialias Antialiasing = Antialias.Subpixel;
-
-
 
     public Block()
     {
-        ImSurface = new ImageSurface(Format.ARGB32, 150, 150);
     }
 
-    public void DrawRoundedSquare(Gdk.Window window)
-    {
-        Context ring = Gdk.CairoHelper.Create(window);
-        PointD point1, point2;
-        point1 = new PointD(70, 0);
-        point2 = new PointD(95, 0);
-        ring.Antialias = Antialiasing;
-        ring.Translate(100, 100);
-        ring.Fill();
-        ring.LineWidth = 3;
-        ring.MoveTo(point1);
-        ring.LineTo(point2);
-        ring.SetSourceColor(new Cairo.Color(1, 0, 0));
-        ring.Stroke();
-        ring.GetTarget().Dispose();
-        ring.Dispose();
-    }
-
-    public void DrawRoundedSquare(Context cx, Vector4 coordinates, int radius)
-    {
-        //var cx = new Context(ImSurface);
-        cx.LineWidth = 3;
-        cx.SetSourceRGB(1, 0, 0); 
-        int a = (int)coordinates.X;
-        int b = (int)coordinates.Y;
-        int c = (int)coordinates.Z;
-        int d = (int)coordinates.W;
-
-        cx.Arc(a + radius, c + radius, radius, 2 * (Math.PI / 2), 3 * (Math.PI / 2));
-        cx.Arc(b - radius, c + radius, radius, 3 * (Math.PI / 2), 4 * (Math.PI / 2));
-        cx.Arc(b - radius, d - radius, radius, 0 * (Math.PI / 2), 1 * (Math.PI / 2));
-        cx.Arc(a + radius, d - radius, radius, 1 * (Math.PI / 2), 2 * (Math.PI / 2));
-        cx.ClosePath();
-        cx.Fill();
-    }
+    public int GetNextValue() => 2 * Value;
 
 
-
+    
 }
 
 
