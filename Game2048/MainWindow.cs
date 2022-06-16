@@ -34,11 +34,9 @@ class MainWindow : Gtk.Window
     private void DrawGrid()
     {
         blocksController.View.Clear();
-        for (int i = 0; i < GameParameters.BlockCount; i++)
-        {
-            var coordinates = i.IndexToCoordinatesOfMatrix(GameParameters.RowColumnCount);
-            blocksController.View.DrawBlock(blocksController.Blocks.BlocksList[i].Value, new Cairo.Point(coordinates.X, coordinates.Y));
-        }
+        for (int i = 0; i < GameParameters.RowColumnCount; i++)
+            for (int j = 0; j < GameParameters.RowColumnCount; j++)
+                blocksController.View.DrawBlock(blocksController.Blocks.BlocksMatrix[j][i].Value, new Cairo.Point(i, j));
     }
 
     private void InitHeaderBar()

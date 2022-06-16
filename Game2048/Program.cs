@@ -39,12 +39,14 @@ class Program
 
     public static void Restart()
     {
-        App.RemoveWindow(Win);
-        Win.Close();
-        Win.Dispose();
-        Win.Destroy();        
-        Win = null;
-
+        foreach (var win in App.Windows)
+        {
+            App.RemoveWindow(win);
+            App.RemoveWindow(Win);
+            win.Close();
+            win.Dispose();
+            win.Destroy();           
+        }
         Win = new MainWindow();
         App.AddWindow(Win);
         Win.ShowAll();

@@ -12,37 +12,12 @@ public static class Utils
         return (T)v.GetValue(rnd.Next(v.Length));
     }
 
-    public static List<T> Column<T>(this IEnumerable<T> list, int columnIndex, int rowLength)
+    public static List<List<T>> Swap<T>(this List<List<T>> matrix, Cairo.Point p1, Cairo.Point p2)
     {
-        List<T> result = new List<T>();
-        for (int i = 0; i < list.Count(); i += rowLength)
-            result.Add(list.ElementAt(i));
-        return result;
-    }
-
-    public static List<T> Row<T>(this IEnumerable<T> list, int rowIndex, int rowLength)
-    {
-        List<T> result = new List<T>();
-        for (int i = rowIndex * rowLength; i < (rowIndex + 1) * rowLength; i++)
-            result.Add(list.ElementAt(i));
-        return result;
-    }
-
-    public static (int X, int Y) IndexToCoordinatesOfMatrix(this int index, int rowLength)
-    {
-        int row = (int)Math.Floor((double)index / rowLength);
-        int column = (int)Math.Round((double)((double)index / rowLength - row) * rowLength);
-        return (column,row);
-    }
-
-    public static int CoordinatesOfMatrixToIndex(this Cairo.Point coordinates, int rowLength) => coordinates.X * rowLength + coordinates.Y;
-
-    public static List<T> Swap<T>(this List<T> list, int index1, int index2)
-    {
-        T temp = list[index1];
-        list[index1] = list[index2];
-        list[index2] = temp;
-        return list;
+        T temp = matrix[p1.X][p1.Y];
+        matrix[p1.X][p1.Y] = matrix[p2.X][p2.Y];
+        matrix[p2.X][p2.Y] = temp;
+        return matrix;
     }
 
     public static bool HasDuplicates<T>(this IEnumerable<T> list, int allowedDistance)
@@ -57,6 +32,36 @@ public static class Utils
                 set.Remove(list.ElementAt(i - allowedDistance));
         }
         return false;
+    }
+
+    public static void ForEach2D<T>(this IEnumerable<IEnumerable<T>> lists, Action<T> action)
+    {
+        foreach (IEnumerable<T> list in lists)
+            foreach (T item in list)
+                action(item);
+    }
+
+    public static List<T> Column<T>(this IEnumerable<IEnumerable<T>> matrix, int columnNumber)
+    {
+        return Enumerable.Range(0, matrix.Count())
+                .Select(x => matrix.ElementAt(columnNumber).ElementAt(x))
+                .ToList();
+    }
+
+    public static List<T> Row<T>(this IEnumerable<IEnumerable<T>> matrix, int rowNumber)
+    {
+        return Enumerable.Range(0, matrix.First().Count())
+                .Select(x => matrix.ElementAt(x).ElementAt(rowNumber))
+                .ToList();
+    }
+
+    public static (int X, int Y) CoordinatesOf<T>(this IEnumerable<IEnumerable<T>> matrix, T value)
+    {
+        for (int row = 0; row < matrix.First().Count(); row++)
+            for (int column = 0; column < matrix.Count(); ++column)
+                if (matrix.ElementAt(row).ElementAt(column).Equals(value))
+                    return (row, column);
+        return (-1, -1);
     }
 
 }

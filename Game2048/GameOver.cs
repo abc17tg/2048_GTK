@@ -18,7 +18,6 @@ public class GameOver
         Button gameOverBtn = new Button(label);
         gameOverBtn.Clicked += (sender, e) =>
         {
-            Program.App.RemoveWindow(go);
             go.Close();
             go.Hide();
             go.Dispose();
@@ -30,13 +29,13 @@ public class GameOver
         go.ShowAll();
     }
 
-    public bool IsGameOver(List<Block> blocks)
+    public bool IsGameOver(List<List<Block>> blocks)
     {
         for (int i = 0; i < GameParameters.RowColumnCount; i++)
         {
-            if (blocks.Row(i, GameParameters.RowColumnCount).Select(p => p.Value).HasDuplicates(1))
+            if (blocks.Row(i).Select(p => p.Value).HasDuplicates(1))
                 return false;
-            if (blocks.Column(i, GameParameters.RowColumnCount).Select(p => p.Value).HasDuplicates(1))
+            if (blocks.Column(i).Select(p => p.Value).HasDuplicates(1))
                 return false;
         }
         return true;

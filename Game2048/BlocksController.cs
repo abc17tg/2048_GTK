@@ -15,6 +15,8 @@ public class BlocksController
         GameOverObject = new GameOver();
         View = new BlocksView();
         Blocks = new BlocksManager();
+        TrySpawn();
+        TrySpawn();
     }
 
     public void Move(object s, KeyPressEventArgs e)
@@ -41,7 +43,7 @@ public class BlocksController
         TryMove(direction, out bool merged);
         if (merged)
             if (!TrySpawn())
-                if (GameOverObject.IsGameOver(Blocks.BlocksList))
+                if (GameOverObject.IsGameOver(Blocks.BlocksMatrix))
                     GameOverObject.GameOverWindow();
     }
 
@@ -51,10 +53,9 @@ public class BlocksController
             return false;
 
         Random rnd = new Random();
-        List<Block> emptyBlocks = Blocks.BlocksList.Where(p => p.Value == 1).ToList();
-        int randomEmptyIndex = Blocks.BlocksList.IndexOf(emptyBlocks.ElementAt(rnd.Next(emptyBlocks.Count)));
-        var coordinates = randomEmptyIndex.IndexToCoordinatesOfMatrix(GameParameters.RowColumnCount);
-        Blocks.BlocksList[randomEmptyIndex].Value = rnd.Next(101) < 30 ? 4 : 2;
+        Block emptyBlock = Blocks.BlocksList.Where(p => p.Value == 1).OrderBy(x => rnd.Next()).First();
+        var coords = Blocks.BlocksMatrix.CoordinatesOf(emptyBlock);
+        Blocks.BlocksMatrix[coords.X][coords.Y].Value = rnd.Next(101) < 30 ? 4 : 2;
         return true;
     }
 
@@ -86,8 +87,6 @@ public class BlocksController
             direction == Direction.Up ? i < GameParameters.RowColumnCount - 1 : i > 0;
             i = direction == Direction.Up ? i + 1 : i - 1)
         {
-            var targetRow = Blocks.BlocksList.Row(i, GameParameters.RowColumnCount);
-            var sourceRow = Blocks.BlocksList.Row(direction == Direction.Up ? i + 1 : i - 1, GameParameters.RowColumnCount);
             for (int j = 0; j < GameParameters.RowColumnCount; j++)
                 if (!TryMerge(new Cairo.Point(direction == Direction.Up ? i + 1 : i - 1, j), new Cairo.Point(i, j)))
                     merged.Add(true);
@@ -102,8 +101,6 @@ public class BlocksController
         List<bool> merged = new List<bool>();
         for (int i = 0; i < GameParameters.RowColumnCount; i++)
         {
-            var targetRow = Blocks.BlocksList.Column(i, GameParameters.RowColumnCount);
-            var sourceRow = Blocks.BlocksList.Column(direction == Direction.Up ? i + 1 : i - 1, GameParameters.RowColumnCount);
             for (int j = direction == Direction.Left ? 0 : GameParameters.RowColumnCount - 1;
                 direction == Direction.Left ? j < GameParameters.RowColumnCount - 1 : j > 0;
                 j = direction == Direction.Left ? j + 1 : j - 1)
@@ -130,8 +127,6 @@ public class BlocksController
             direction == Direction.Up ? i < GameParameters.RowColumnCount - 1 : i > 0;
             i = direction == Direction.Up ? i + 1 : i - 1)
             {
-                var targetRow = Blocks.BlocksList.Row(i, GameParameters.RowColumnCount);
-                var sourceRow = Blocks.BlocksList.Row(direction == Direction.Up ? i + 1 : i - 1, GameParameters.RowColumnCount);
                 for (int j = 0; j < GameParameters.RowColumnCount; j++)
                     if (!TryMergeEmpty(new Cairo.Point(direction == Direction.Up ? i + 1 : i - 1, j), new Cairo.Point(i, j)))
                         stillEmpty[index++] = false;
@@ -156,8 +151,6 @@ public class BlocksController
             int index = 0;
             for (int i = 0; i < GameParameters.RowColumnCount; i++)
             {
-                var targetRow = Blocks.BlocksList.Column(i, GameParameters.RowColumnCount);
-                var sourceRow = Blocks.BlocksList.Column(direction == Direction.Up ? i + 1 : i - 1, GameParameters.RowColumnCount);
                 for (int j = direction == Direction.Left ? 0 : GameParameters.RowColumnCount - 1;
                     direction == Direction.Left ? j < GameParameters.RowColumnCount - 1 : j > 0;
                     j = direction == Direction.Left ? j + 1 : j - 1)
@@ -178,29 +171,25 @@ public class BlocksController
 
     private bool TryMerge(Cairo.Point source, Cairo.Point target)
     {
-        int indexTarget = target.CoordinatesOfMatrixToIndex(GameParameters.RowColumnCount);
-        int indexSource = source.CoordinatesOfMatrixToIndex(GameParameters.RowColumnCount);
-        if (Blocks.BlocksList[indexSource].Value == 1 || Blocks.BlocksList[indexTarget].Value == 1)
+        //int indexTarget = target.CoordinatesOfMatrixToIndex(GameParameters.RowColumnCount);
+        //int indexSource = source.CoordinatesOfMatrixToIndex(GameParameters.RowColumnCount);
+        if (Blocks.BlocksMatrix[source.X][source.Y].Value == 1 || Blocks.BlocksMatrix[target.X][target.Y].Value == 1)
             return false;
 
-        if (Blocks.BlocksList[indexSource].Value != Blocks.BlocksList[indexTarget].Value)
+        if (Blocks.BlocksMatrix[source.X][source.Y].Value != Blocks.BlocksMatrix[target.X][target.Y].Value)
             return false;
 
-        Blocks.BlocksList = Blocks.BlocksList.Swap(indexSource, indexTarget);
-        Blocks.BlocksList[indexTarget].Value = Blocks.BlocksList[indexTarget].GetNextValue();
-        Blocks.BlocksList[indexSource].Value = 1;
+        Blocks.BlocksMatrix[target.X][target.Y].Value = Blocks.BlocksMatrix[target.X][target.Y].GetNextValue();
+        Blocks.BlocksMatrix[source.X][source.Y].Value = 1;
         return true;
     }
 
     private bool TryMergeEmpty(Cairo.Point source, Cairo.Point empty)
     {
-        int indexSource = source.CoordinatesOfMatrixToIndex(GameParameters.RowColumnCount);
-        int indexEmpty = empty.CoordinatesOfMatrixToIndex(GameParameters.RowColumnCount);
-
-        if (Blocks.BlocksList[indexEmpty].Value != 1 || Blocks.BlocksList[indexSource].Value == 1)
+        if (Blocks.BlocksMatrix[empty.X][empty.Y].Value != 1 || Blocks.BlocksMatrix[source.X][source.Y].Value == 1)
             return false;
 
-        Blocks.BlocksList = Blocks.BlocksList.Swap(indexEmpty, indexSource);
+        Blocks.BlocksMatrix = Blocks.BlocksMatrix.Swap(source, empty);
         return true;
     }
 
