@@ -68,7 +68,8 @@ public class BlocksController
                 result = true;
             if (MergeUpDown(direction))
                 result = true;
-            MergeEmptyUpDown(direction);
+            if(result)
+                MergeEmptyUpDown(direction);
         }
         else
         {
@@ -76,7 +77,8 @@ public class BlocksController
                 result = true;
             if (MergeLeftRight(direction))
                 result = true;
-            MergeEmptyLeftRight(direction);
+            if(result)
+                MergeEmptyLeftRight(direction);
         }
     }
 
@@ -88,12 +90,12 @@ public class BlocksController
             i = direction == Direction.Up ? i + 1 : i - 1)
         {
             for (int j = 0; j < GameParameters.RowColumnCount; j++)
-                if (!TryMerge(new Cairo.Point(direction == Direction.Up ? i + 1 : i - 1, j), new Cairo.Point(i, j)))
+                if (TryMerge(new Cairo.Point(direction == Direction.Up ? i + 1 : i - 1, j), new Cairo.Point(i, j)))
                     merged.Add(true);
                 else
                     merged.Add(false);
         }
-        return merged.First();
+        return merged.Contains(true);
     }
 
     private bool MergeLeftRight(Direction direction)
@@ -105,23 +107,23 @@ public class BlocksController
                 direction == Direction.Left ? j < GameParameters.RowColumnCount - 1 : j > 0;
                 j = direction == Direction.Left ? j + 1 : j - 1)
             {
-                if (!TryMerge(new Cairo.Point(i, direction == Direction.Left ? j + 1 : j - 1), new Cairo.Point(i, j)))
+                if (TryMerge(new Cairo.Point(i, direction == Direction.Left ? j + 1 : j - 1), new Cairo.Point(i, j)))
                     merged.Add(true);
                 else
                     merged.Add(false);
             }
         }
-        return merged.First();
+        return merged.Contains(true);
     }
 
     private bool MergeEmptyUpDown(Direction direction)
     {
         bool merged = false;
         int loop = 0;
-        List<bool> stillEmpty;
+        List<bool> wasMerged;
         do
         {
-            stillEmpty = Enumerable.Repeat(true, GameParameters.BlockCount - GameParameters.RowColumnCount).ToList();
+            wasMerged = Enumerable.Repeat(true, GameParameters.BlockCount - GameParameters.RowColumnCount).ToList();
             int index = 0;
             for (int i = direction == Direction.Up ? 0 : GameParameters.RowColumnCount - 1;
             direction == Direction.Up ? i < GameParameters.RowColumnCount - 1 : i > 0;
@@ -129,13 +131,13 @@ public class BlocksController
             {
                 for (int j = 0; j < GameParameters.RowColumnCount; j++)
                     if (!TryMergeEmpty(new Cairo.Point(direction == Direction.Up ? i + 1 : i - 1, j), new Cairo.Point(i, j)))
-                        stillEmpty[index++] = false;
+                        wasMerged[index++] = false;
             }
 
-            if (loop++ == 0 && stillEmpty.Contains(true))
+            if (loop++ == 0 && wasMerged.Contains(true))
                 merged = true;
 
-        } while (stillEmpty.Contains(true));
+        } while (wasMerged.Contains(true));
 
         return merged;
     }
@@ -144,10 +146,10 @@ public class BlocksController
     {
         bool merged = false;
         int loop = 0;
-        List<bool> stillEmpty;
+        List<bool> wasMerged;
         do
         {
-            stillEmpty = Enumerable.Repeat(true, GameParameters.BlockCount - GameParameters.RowColumnCount).ToList();
+            wasMerged = Enumerable.Repeat(true, GameParameters.BlockCount - GameParameters.RowColumnCount).ToList();
             int index = 0;
             for (int i = 0; i < GameParameters.RowColumnCount; i++)
             {
@@ -156,14 +158,14 @@ public class BlocksController
                     j = direction == Direction.Left ? j + 1 : j - 1)
                 {
                     if (!TryMergeEmpty(new Cairo.Point(i, direction == Direction.Left ? j + 1 : j - 1), new Cairo.Point(i, j)))
-                        stillEmpty[index++] = false;
+                        wasMerged[index++] = false;
                 }
             }
 
-            if (loop++ == 0 && stillEmpty.Contains(true))
+            if (loop++ == 0 && wasMerged.Contains(true))
                 merged = true;
 
-        } while (stillEmpty.Contains(true));
+        } while (wasMerged.Contains(true));
 
         return merged;
     }
@@ -171,8 +173,6 @@ public class BlocksController
 
     private bool TryMerge(Cairo.Point source, Cairo.Point target)
     {
-        //int indexTarget = target.CoordinatesOfMatrixToIndex(GameParameters.RowColumnCount);
-        //int indexSource = source.CoordinatesOfMatrixToIndex(GameParameters.RowColumnCount);
         if (Blocks.BlocksMatrix[source.X][source.Y].Value == 1 || Blocks.BlocksMatrix[target.X][target.Y].Value == 1)
             return false;
 
