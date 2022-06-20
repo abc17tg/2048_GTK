@@ -6,6 +6,7 @@ using System.Linq;
 namespace Game2048;
 public class GameOver
 {
+    public bool IsGameOver = false;
     public void GameOverWindow()
     {
         Window go = new Window(WindowType.Popup);
@@ -29,13 +30,16 @@ public class GameOver
         go.ShowAll();
     }
 
-    public bool IsGameOver(List<List<Block>> blocks)
+    public bool CheckGameOver(BlocksManager blocks)
     {
+        if (blocks.BlocksList.Any(p => p.Value == 1))
+            return false;
+
         for (int i = 0; i < GameParameters.RowColumnCount; i++)
         {
-            if (blocks.Row(i).Select(p => p.Value).HasDuplicates(1))
+            if (blocks.BlocksMatrix.Row(i).Select(p => p.Value).HasDuplicates(1))
                 return false;
-            if (blocks.Column(i).Select(p => p.Value).HasDuplicates(1))
+            if (blocks.BlocksMatrix.Column(i).Select(p => p.Value).HasDuplicates(1))
                 return false;
         }
         return true;

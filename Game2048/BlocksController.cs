@@ -15,8 +15,8 @@ public class BlocksController
         GameOverObject = new GameOver();
         View = new BlocksView();
         Blocks = new BlocksManager();
-        TrySpawn();
-        TrySpawn();
+        Spawn();
+        Spawn();
     }
 
     public void Move(object s, KeyPressEventArgs e)
@@ -40,23 +40,27 @@ public class BlocksController
 
     public void Move(Direction direction)
     {
+        if (GameOverObject.IsGameOver)
+            GameOverObject.GameOverWindow();
+
         TryMove(direction, out bool merged);
+        
         if (merged)
-            if (!TrySpawn())
-                if (GameOverObject.IsGameOver(Blocks.BlocksMatrix))
-                    GameOverObject.GameOverWindow();
+            Spawn();
+
+        if (GameOverObject.CheckGameOver(Blocks))
+            GameOverObject.IsGameOver = true;
     }
 
-    private bool TrySpawn()
+    private void Spawn()
     {
         if (!Blocks.BlocksList.Any(p => p.Value == 1))
-            return false;
+            return;
 
         Random rnd = new Random();
         Block emptyBlock = Blocks.BlocksList.Where(p => p.Value == 1).OrderBy(x => rnd.Next()).First();
         var coords = Blocks.BlocksMatrix.CoordinatesOf(emptyBlock);
         Blocks.BlocksMatrix[coords.X][coords.Y].Value = rnd.Next(101) < 30 ? 4 : 2;
-        return true;
     }
 
     private void TryMove(Direction direction, out bool result)
@@ -68,7 +72,7 @@ public class BlocksController
                 result = true;
             if (MergeUpDown(direction))
                 result = true;
-            if(result)
+            if (result)
                 MergeEmptyUpDown(direction);
         }
         else
@@ -77,7 +81,7 @@ public class BlocksController
                 result = true;
             if (MergeLeftRight(direction))
                 result = true;
-            if(result)
+            if (result)
                 MergeEmptyLeftRight(direction);
         }
     }
@@ -120,11 +124,11 @@ public class BlocksController
             wasMerged = false;
             for (int i = direction == Direction.Up ? 0 : GameParameters.RowColumnCount - 1;
             direction == Direction.Up ? i < GameParameters.RowColumnCount - 1 : i > 0;
-            i = direction == Direction.Up ? i + 1 : i - 1)          
+            i = direction == Direction.Up ? i + 1 : i - 1)
                 for (int j = 0; j < GameParameters.RowColumnCount; j++)
                     if (TryMergeEmpty(new Cairo.Point(direction == Direction.Up ? i + 1 : i - 1, j), new Cairo.Point(i, j)))
                         wasMerged = true;
-            
+
             if (loop++ == 0 && wasMerged)
                 merged = true;
 
@@ -141,12 +145,12 @@ public class BlocksController
         do
         {
             wasMerged = false;
-            for (int i = 0; i < GameParameters.RowColumnCount; i++)           
+            for (int i = 0; i < GameParameters.RowColumnCount; i++)
                 for (int j = direction == Direction.Left ? 0 : GameParameters.RowColumnCount - 1;
                     direction == Direction.Left ? j < GameParameters.RowColumnCount - 1 : j > 0;
-                    j = direction == Direction.Left ? j + 1 : j - 1)               
+                    j = direction == Direction.Left ? j + 1 : j - 1)
                     if (TryMergeEmpty(new Cairo.Point(i, direction == Direction.Left ? j + 1 : j - 1), new Cairo.Point(i, j)))
-                        wasMerged = true;               
+                        wasMerged = true;
 
             if (loop++ == 0 && wasMerged)
                 merged = true;
