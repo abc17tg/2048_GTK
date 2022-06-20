@@ -1,17 +1,26 @@
 ﻿using Gtk;
 using Cairo;
 using System;
+using System.Collections.Generic;
 
 namespace Game2048;
 public class BlocksView : DrawingArea
 {
-    public ImageSurface GameCanvas = new ImageSurface(Format.Argb32, (int)Math.Round(GameParameters.WindowSize.X), (int)Math.Round(GameParameters.WindowSize.Y));
+    public ImageSurface GameCanvas;
     public Context GameContext => new Context(GameCanvas);
 
     public void Clear()
     {
         GameCanvas = new ImageSurface(Format.Argb32, (int)Math.Round(GameParameters.WindowSize.X), (int)Math.Round(GameParameters.WindowSize.Y));
         QueueDraw();
+    }
+
+    public void DrawGrid(List<List<Block>> blocksMatrix)
+    {
+        Clear();
+        for (int i = 0; i < GameParameters.RowColumnCount; i++)
+            for (int j = 0; j < GameParameters.RowColumnCount; j++)
+                DrawBlock(blocksMatrix[j][i].Value, new Cairo.Point(i, j));
     }
 
     public void DrawBlock(int value, Cairo.Point position)

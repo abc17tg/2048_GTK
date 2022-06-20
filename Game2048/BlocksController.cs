@@ -84,60 +84,51 @@ public class BlocksController
 
     private bool MergeUpDown(Direction direction)
     {
-        List<bool> merged = new List<bool>();
+        bool merged = false;
         for (int i = direction == Direction.Up ? 0 : GameParameters.RowColumnCount - 1;
             direction == Direction.Up ? i < GameParameters.RowColumnCount - 1 : i > 0;
             i = direction == Direction.Up ? i + 1 : i - 1)
         {
             for (int j = 0; j < GameParameters.RowColumnCount; j++)
                 if (TryMerge(new Cairo.Point(direction == Direction.Up ? i + 1 : i - 1, j), new Cairo.Point(i, j)))
-                    merged.Add(true);
-                else
-                    merged.Add(false);
+                    merged = true;
         }
-        return merged.Contains(true);
+        return merged;
     }
 
     private bool MergeLeftRight(Direction direction)
     {
-        List<bool> merged = new List<bool>();
+        bool merged = false;
         for (int i = 0; i < GameParameters.RowColumnCount; i++)
         {
             for (int j = direction == Direction.Left ? 0 : GameParameters.RowColumnCount - 1;
                 direction == Direction.Left ? j < GameParameters.RowColumnCount - 1 : j > 0;
                 j = direction == Direction.Left ? j + 1 : j - 1)
-            {
                 if (TryMerge(new Cairo.Point(i, direction == Direction.Left ? j + 1 : j - 1), new Cairo.Point(i, j)))
-                    merged.Add(true);
-                else
-                    merged.Add(false);
-            }
+                    merged = true;
         }
-        return merged.Contains(true);
+        return merged;
     }
 
     private bool MergeEmptyUpDown(Direction direction)
     {
         bool merged = false;
         int loop = 0;
-        List<bool> wasMerged;
+        bool wasMerged;
         do
         {
-            wasMerged = Enumerable.Repeat(true, GameParameters.BlockCount - GameParameters.RowColumnCount).ToList();
-            int index = 0;
+            wasMerged = false;
             for (int i = direction == Direction.Up ? 0 : GameParameters.RowColumnCount - 1;
             direction == Direction.Up ? i < GameParameters.RowColumnCount - 1 : i > 0;
-            i = direction == Direction.Up ? i + 1 : i - 1)
-            {
+            i = direction == Direction.Up ? i + 1 : i - 1)          
                 for (int j = 0; j < GameParameters.RowColumnCount; j++)
-                    if (!TryMergeEmpty(new Cairo.Point(direction == Direction.Up ? i + 1 : i - 1, j), new Cairo.Point(i, j)))
-                        wasMerged[index++] = false;
-            }
-
-            if (loop++ == 0 && wasMerged.Contains(true))
+                    if (TryMergeEmpty(new Cairo.Point(direction == Direction.Up ? i + 1 : i - 1, j), new Cairo.Point(i, j)))
+                        wasMerged = true;
+            
+            if (loop++ == 0 && wasMerged)
                 merged = true;
 
-        } while (wasMerged.Contains(true));
+        } while (wasMerged);
 
         return merged;
     }
@@ -146,26 +137,21 @@ public class BlocksController
     {
         bool merged = false;
         int loop = 0;
-        List<bool> wasMerged;
+        bool wasMerged;
         do
         {
-            wasMerged = Enumerable.Repeat(true, GameParameters.BlockCount - GameParameters.RowColumnCount).ToList();
-            int index = 0;
-            for (int i = 0; i < GameParameters.RowColumnCount; i++)
-            {
+            wasMerged = false;
+            for (int i = 0; i < GameParameters.RowColumnCount; i++)           
                 for (int j = direction == Direction.Left ? 0 : GameParameters.RowColumnCount - 1;
                     direction == Direction.Left ? j < GameParameters.RowColumnCount - 1 : j > 0;
-                    j = direction == Direction.Left ? j + 1 : j - 1)
-                {
-                    if (!TryMergeEmpty(new Cairo.Point(i, direction == Direction.Left ? j + 1 : j - 1), new Cairo.Point(i, j)))
-                        wasMerged[index++] = false;
-                }
-            }
+                    j = direction == Direction.Left ? j + 1 : j - 1)               
+                    if (TryMergeEmpty(new Cairo.Point(i, direction == Direction.Left ? j + 1 : j - 1), new Cairo.Point(i, j)))
+                        wasMerged = true;               
 
-            if (loop++ == 0 && wasMerged.Contains(true))
+            if (loop++ == 0 && wasMerged)
                 merged = true;
 
-        } while (wasMerged.Contains(true));
+        } while (wasMerged);
 
         return merged;
     }

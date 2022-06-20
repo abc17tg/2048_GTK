@@ -12,7 +12,6 @@ class MainWindow : Gtk.Window
     private Button quitButton;
 
     public BlocksController blocksController;
-    public Block block;
 
     public MainWindow() : base(Gtk.WindowType.Toplevel)
     {
@@ -25,18 +24,10 @@ class MainWindow : Gtk.Window
         blocksController.View.SetSizeRequest((int)Math.Round(GameParameters.WindowSize.X), (int)Math.Round(GameParameters.WindowSize.Y));
         blocksController.View.ShowAll();
         Child = blocksController.View;
-        DrawGrid();
+        blocksController.View.DrawGrid(blocksController.Blocks.BlocksMatrix);
 
         KeyPressEvent += blocksController.Move;
-        KeyReleaseEvent += (sender, e) => DrawGrid();
-    }
-
-    private void DrawGrid()
-    {
-        blocksController.View.Clear();
-        for (int i = 0; i < GameParameters.RowColumnCount; i++)
-            for (int j = 0; j < GameParameters.RowColumnCount; j++)
-                blocksController.View.DrawBlock(blocksController.Blocks.BlocksMatrix[j][i].Value, new Cairo.Point(i, j));
+        KeyReleaseEvent += (sender, e) => blocksController.View.DrawGrid(blocksController.Blocks.BlocksMatrix);
     }
 
     private void InitHeaderBar()
@@ -64,7 +55,7 @@ class MainWindow : Gtk.Window
         randomButton.Clicked += (sender, e) =>
         {
             blocksController.Move(Utils.RandomEnumValue<BlocksController.Direction>());
-            DrawGrid();
+            blocksController.View.DrawGrid(blocksController.Blocks.BlocksMatrix);
         };
 
         quitButton = new Button();
