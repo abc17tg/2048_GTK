@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Game2048;
@@ -21,9 +20,5 @@ public class BlocksManager
         }
 
         BlocksMatrix.ForEach2D(p => p.Value = 1);
-        /*Random rnd = new Random();
-        List<int> startIndexes = Enumerable.Range(0, GameParameters.RowColumnCount).OrderBy(x => rnd.Next()).Take(2).ToList();
-        for (int i = 0; i < startIndexes.Count; i++)
-            BlocksMatrix[rnd.Next(0,GameParameters.RowColumnCount)][startIndexes[i]].Value = 2;*/
     }
 }

@@ -1,9 +1,7 @@
 using System;
 using Gtk;
-using Gdk;
 
 namespace Game2048;
-
 class Program
 {
     public static Application App;

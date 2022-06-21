@@ -1,6 +1,5 @@
 ﻿using Gtk;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Game2048;
@@ -13,8 +12,8 @@ public class BlocksController
     public BlocksController()
     {
         GameOverObject = new GameOver();
-        View = new BlocksView();
         Blocks = new BlocksManager();
+        View = new BlocksView(Blocks);
         Spawn();
         Spawn();
     }

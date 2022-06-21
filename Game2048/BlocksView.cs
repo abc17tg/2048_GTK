@@ -1,36 +1,32 @@
 ﻿using Gtk;
 using Cairo;
 using System;
-using System.Collections.Generic;
 
 namespace Game2048;
 public class BlocksView : DrawingArea
 {
-    public ImageSurface GameCanvas;
-    public Context GameContext => new Context(GameCanvas);
+    private BlocksManager grid;
 
-    public void Clear()
+    public BlocksView(BlocksManager grid)
     {
-        GameCanvas = new ImageSurface(Format.Argb32, (int)Math.Round(GameParameters.WindowSize.X), (int)Math.Round(GameParameters.WindowSize.Y));
-        QueueDraw();
+        this.grid = grid;
     }
 
-    public void DrawGrid(List<List<Block>> blocksMatrix)
+    public void DrawGrid(Context context)
     {
-        Clear();
         for (int i = 0; i < GameParameters.RowColumnCount; i++)
             for (int j = 0; j < GameParameters.RowColumnCount; j++)
-                DrawBlock(blocksMatrix[j][i].Value, new Cairo.Point(i, j));
+                DrawBlock(context, grid.BlocksMatrix[j][i].Value, new Cairo.Point(i, j));
     }
 
-    public void DrawBlock(int value, Cairo.Point position)
+    public void DrawBlock(Context context, int value, Cairo.Point position)
     {
-        DrawSquare(GameContext, value, position, DrawType.Shadow);
-        DrawSquare(GameContext, value, position, DrawType.Background);
-        DrawSquare(GameContext, value, position, DrawType.Main);
+        DrawSquare(context, value, position, DrawType.Shadow);
+        DrawSquare(context, value, position, DrawType.Background);
+        DrawSquare(context, value, position, DrawType.Main);
         if (value != 1)
-            DrawText(GameContext, value, position);
-        QueueDraw();
+            DrawText(context, value, position);
+        QueueDraw();     
     }
 
     public Cairo.Point IndexPositionToRealPosition(Cairo.Point indexPosition)
@@ -101,12 +97,12 @@ public class BlocksView : DrawingArea
         Cairo.Point positionReal = IndexPositionToRealPosition(position);
         cx.MoveTo((blockSize - textWidth) / 2 + positionReal.X, (blockSize * 0.96 - textHeight) / 2 + positionReal.Y);
         Pango.CairoHelper.ShowLayout(cx, layout);
+        cx.Fill();
     }
 
     protected override bool OnDrawn(Context cx)
     {
-        cx.SetSourceSurface(GameCanvas, 0, 0);
-        cx.Paint();
+        DrawGrid(cx);
         return true;
     }
 

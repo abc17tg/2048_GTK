@@ -24,10 +24,8 @@ class MainWindow : Gtk.Window
         blocksController.View.SetSizeRequest((int)Math.Round(GameParameters.WindowSize.X), (int)Math.Round(GameParameters.WindowSize.Y));
         blocksController.View.ShowAll();
         Child = blocksController.View;
-        blocksController.View.DrawGrid(blocksController.Blocks.BlocksMatrix);
 
         KeyPressEvent += blocksController.Move;
-        KeyReleaseEvent += (sender, e) => blocksController.View.DrawGrid(blocksController.Blocks.BlocksMatrix);
     }
 
     private void InitHeaderBar()
@@ -52,11 +50,7 @@ class MainWindow : Gtk.Window
 
         randomButton = new Button();
         randomButton.Label = "Random";
-        randomButton.Clicked += (sender, e) =>
-        {
-            blocksController.Move(Utils.RandomEnumValue<BlocksController.Direction>());
-            blocksController.View.DrawGrid(blocksController.Blocks.BlocksMatrix);
-        };
+        randomButton.Clicked += (sender, e) => blocksController.Move(Utils.RandomEnumValue<BlocksController.Direction>());
 
         quitButton = new Button();
         quitButton.Label = "Quit";
